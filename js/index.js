@@ -6,7 +6,14 @@ appleButton.addEventListener("click", async function fetchApple() {
         const appleData = await response.json();
         console.log("response : ", appleData);
         
-    } catch (error) {
+        if (!response.ok) {
+         if (response.status === 404) {
+           throw new Error('404: Resource not found');
+         } else {
+           throw new Error(`HTTP error! Status: ${response.status}`);
+         }
+        
+    }} catch (error) {
         
     }
     
