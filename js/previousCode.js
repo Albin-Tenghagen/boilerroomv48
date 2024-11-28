@@ -19,7 +19,8 @@ const fetchApiResults = async (type = "all") => {
         break;
 
       case "economy":
-        url = 'https://newsapi.org/v2/top-headlines?language=en&category=business&apiKey=1006e9f332db40bd8553b27720785488'
+        url =
+          "https://newsapi.org/v2/top-headlines?language=en&category=business&apiKey=1006e9f332db40bd8553b27720785488";
         break;
 
       default:
@@ -205,7 +206,6 @@ window.addEventListener("DOMContentLoaded", async function () {
 techButton.addEventListener("click", async function () {
   await fetchApiResults("tech");
 });
-  
 
 appleButton.addEventListener("click", async function () {
   await fetchApiResults("apple");
