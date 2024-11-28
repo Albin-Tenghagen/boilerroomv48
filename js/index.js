@@ -208,6 +208,9 @@
       
 
 
+// window 
+// https://newsapi.org/v2/top-headlines?country=us&language=en&apiKey=1006e9f332db40bd8553b27720785488
+
 
       // tech    let apiUrl = `https://newsapi.org/v2/everything?q=tech&language=en&from=2024-11-05&sortBy=publishedAt&apiKey=1006e9f332db40bd8553b27720785488`;
  
