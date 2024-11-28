@@ -1,9 +1,3 @@
-console.log("JS file from last week");
-function removeAllChildren(articleSection) {
-  while (articleSection.firstChild) {
-    articleSection.removeChild(articleSection.firstChild);
-  }
-}
 let articleArray = [];
 //---------------------DOM FUNCTION--------------
 
