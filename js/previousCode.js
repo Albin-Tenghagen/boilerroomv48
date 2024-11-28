@@ -403,8 +403,28 @@ appleButton.addEventListener("click", async function fetchApple() {
       console.log("appleButton is responsive")
       articleSection.replaceChildren();
       const response = await fetch('https://newsapi.org/v2/everything?q=apple&language=en&from=2024-11-5&sortBy=publishedAt&apiKey=1006e9f332db40bd8553b27720785488')
-      const appleData = await response.json();
-      console.log("response : ", appleData);
+      
+      if (!response.ok) {
+        // Felhantering baserat på statuskod
+        if (response.status === 400) {
+            throw new Error('400: Bad Request')
+        } else if (response.status === 401) {
+            throw new Error('401: Unauthorized')
+        } else if (response.status === 403) {
+            throw new Error('403: Forbidden access')
+        } else if (response.status === 404) {
+            throw new Error('404: Resource not found')
+        } else if (response.status === 429) {
+            throw new Error('429: Too Many Requests')
+        } else if (response.status === 500) {
+            throw new Error('500: Internal Server Error')
+        } else {
+            throw new Error(`"HTTP error! Status: ${response.status}`)
+        }
+      }
+        const appleData = await response.json();
+
+        console.log("response : ", appleData);
 
       
         articleArray = appleData.articles
@@ -446,10 +466,12 @@ appleButton.addEventListener("click", async function fetchApple() {
         
           let articleImage = document.createElement("img")
           articleImage.setAttribute("class", "articleImage")
-          
-          articleImage.src = article.urlToImage    
+
+          articleImage.src = article.urlToImage
           articleContainer.append(articleImage)
-    
+    //
+ 
+    //
           let readMoreButton = document.createElement("a")
             readMoreButton.textContent = "Read more"
             readMoreButton.setAttribute("class", "readMoreButton")
@@ -457,21 +479,14 @@ appleButton.addEventListener("click", async function fetchApple() {
             readMoreButton.href = article.url
             articleContainer.appendChild(readMoreButton)
         });
-      }
-
+      } 
       
-      if (!response.ok) {
-       if (response.status === 404) {
-         throw new Error('404: Resource not found');
-       } else {
-         throw new Error(`HTTP error! Status: ${response.status}`);
-       }
 
-  }} catch (error) {
+
+  } catch (error) {
       console.error("Ett fel/error uppstod: ", error)
+      
   }
-  
-
 })
 
 
