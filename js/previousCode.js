@@ -468,7 +468,7 @@ appleButton.addEventListener("click", async function fetchApple() {
        }
 
   }} catch (error) {
-      
+      console.error("Ett fel/error uppstod: ", error)
   }
   
 
