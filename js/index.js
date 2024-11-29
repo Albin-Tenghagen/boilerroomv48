@@ -1,11 +1,13 @@
+
+//*--------------------Global variabels-------------------------------------
 const itemsPerPage = 15;
 let currentPage = 1;
 let articleArray = [];
-//  let intervalId = setInterval(() => {
-//     fetchData()
-//  }, (1000 * 60) * 5);
+ let intervalId = setInterval(() => {
+    fetchApiResults()
+ }, (1000 * 60) * 5);
 
-//--------------------------------------------------------------------------
+//*-------------------------------------------------------------------------
 //-----------------Header Creation------------------------------------------
 let headerContainer = document.createElement("header");
 headerContainer.setAttribute("class", "headerContainer");
@@ -89,21 +91,8 @@ const fetchApiResults = async (type = "all") => {
             
             if (!response.ok) {
               // Felhantering baserat på statuskod
-              if (response.status === 400) {
-                throw new Error("400: Bad Request");
-              } else if (response.status === 401) {
-                throw new Error("401: Unauthorized");
-              } else if (response.status === 403) {
-                throw new Error("403: Forbidden access");
-              } else if (response.status === 404) {
-                throw new Error("404: Resource not found");
-              } else if (response.status === 429) {
-                throw new Error("429: Too Many Requests");
-              } else if (response.status === 500) {
-                throw new Error("500: Internal Server Error");
-              } else {
-                throw new Error(`"HTTP error! Status: ${response.status}`);
-              }
+              //TODO
+             responseMessage(response.status)
             }
             const data = await response.json();
             articleArray = data.articles;
@@ -295,3 +284,21 @@ function createArticles(article) {
     articleContainer.appendChild(readMoreButton);
 }
 //------------------------------------------------------------
+function responseMessage(response){
+    switch (response.status) {
+        case 400:    
+            throw new Error('400: Bad Request');
+        case 401:
+            throw new Error('401: Unauthorized');
+        case 403:
+            throw new Error('403: Forbidden access');
+        case 404:
+            throw new Error('404: Resource not found');
+        case 429:
+            throw new Error('429: Too Many Requests');
+        case 500:
+            throw new Error('500: Internal Server Error');
+        default:
+            throw new Error(`"HTTP error! Status: ${response.status}`);
+        }
+    }
