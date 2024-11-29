@@ -58,6 +58,10 @@ searchNewsButton.setAttribute("class", "searchNewsButton");
 searchNewsButton.innerText = "Search";
 searchForm.appendChild(searchNewsButton);
 
+let errorContainer = document.createElement("div")
+errorContainer.setAttribute("id", "errorContainer")
+newsContainer.appendChild(errorContainer)
+
 let articleSection = document.createElement("section");
 articleSection.setAttribute("class", "articleSection");
 newsContainer.appendChild(articleSection);
@@ -77,7 +81,7 @@ const fetchApiResults = async (type = "all") => {
           
           case "economy":
             url =
-            "https://newsapi.org/v2/top-headlines?language=en&category=business&apiKey=1006e9f332db40bd8553b27720785488";
+            "https://newsapi.org/v2/top-headlines?language=en&category=business&apiKey=1006e9f332db40bd8553b2772078548";
             break;
             
             default:
@@ -125,6 +129,7 @@ const fetchApiResults = async (type = "all") => {
             updatePagination()
       }
     } catch (error) {
+      showError(error.message)
       console.error("Ett fel/error uppstod: ", error);
     }
   };
@@ -315,3 +320,23 @@ function responseMessage(response){
             throw new Error(`"HTTP error! Status: ${response.status}`);
         }
     }
+
+
+//------------------------------------------------------------
+
+function showError(message) {
+  // Get the error container
+  const errorContainer = document.getElementById('errorContainer');
+
+  // Set the error message
+  errorContainer.textContent = message;
+
+  // Show the container
+  errorContainer.style.display = 'block';
+
+  // Optionally, hide the error after a few seconds
+  setTimeout(() => {
+      errorContainer.style.display = 'none';
+      errorContainer.textContent = ''; // Clear the error message
+  }, 5000); // Adjust the duration (5000ms = 5 seconds) as needed
+}
