@@ -131,7 +131,7 @@ body {
       padding: 10px;
       border-radius: 5px;
       z-index: 1000;
-      max-width: 300px;
+      max-width: 50rem;
       word-wrap: break-word;
       font-size: 14px;
   }

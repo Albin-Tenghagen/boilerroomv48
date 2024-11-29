@@ -129,7 +129,7 @@ const fetchApiResults = async (type = "all") => {
             updatePagination()
       }
     } catch (error) {
-      showError(error.message)
+      showError( "Ett fel uppstod " ,error.message);
       console.error("Ett fel/error uppstod: ", error);
     }
   };
@@ -324,12 +324,12 @@ function responseMessage(response){
 
 //------------------------------------------------------------
 
-function showError(message) {
+function showError(...messages) {
   // Get the error container
   const errorContainer = document.getElementById('errorContainer');
-
+  const fullMessage = messages.join('');
   // Set the error message
-  errorContainer.textContent = message;
+  errorContainer.textContent = fullMessage;
 
   // Show the container
   errorContainer.style.display = 'block';
