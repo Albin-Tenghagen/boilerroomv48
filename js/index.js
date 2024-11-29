@@ -58,6 +58,8 @@ searchNewsButton.setAttribute("class", "searchNewsButton");
 searchNewsButton.innerText = "Search";
 searchForm.appendChild(searchNewsButton);
 
+
+
 let articleSection = document.createElement("section");
 articleSection.setAttribute("class", "articleSection");
 newsContainer.appendChild(articleSection);
@@ -91,21 +93,7 @@ const fetchApiResults = async (type = "all") => {
             
             if (!response.ok) {
               // Felhantering baserat på statuskod
-              if (response.status === 400) {
-                throw new Error("400: Bad Request");
-              } else if (response.status === 401) {
-                throw new Error("401: Unauthorized");
-              } else if (response.status === 403) {
-                throw new Error("403: Forbidden access");
-              } else if (response.status === 404) {
-                throw new Error("404: Resource not found");
-              } else if (response.status === 429) {
-                throw new Error("429: Too Many Requests");
-              } else if (response.status === 500) {
-                throw new Error("500: Internal Server Error");
-              } else {
-                throw new Error(`"HTTP error! Status: ${response.status}`);
-              }
+              responseMessage(response)
             }
             const data = await response.json();
             articleArray = data.articles;
@@ -201,7 +189,7 @@ searchForm.addEventListener("submit", function (event) {
 function paginationSetup() {
     //* Takes the array of data and divides it with how many itmesPerPage we wanted
     const amountOfPages = Math.ceil(articleArray.length / itemsPerPage);
-    console.log("pages count: ", amountOfPages)
+    console.log("Total pages: ", amountOfPages)
 
     const pageControls = document.createElement("article")
     pageControls.setAttribute("class", "pageControls")
@@ -315,3 +303,4 @@ function responseMessage(response){
             throw new Error(`"HTTP error! Status: ${response.status}`);
         }
     }
+    
