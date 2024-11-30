@@ -93,20 +93,22 @@ const fetchApiResults = async (type = "all") => {
             
             const response = await fetch(url);
             
+          
+
             if (!response.ok) {
               // Felhantering baserat på statuskod
               if (response.status === 400) {
-                throw new Error("400: Bad Request");
+                throw new Error('400: Bad Request: Din förfrågan kunde inte bearbetas. Kontrollera att all information är korrekt och försök igen.');
               } else if (response.status === 401) {
-                throw new Error("401: Unauthorized");
+                throw new Error('401: Unauthorized: Du har inte rätt behörighet för att få tillgång till detta innehåll.');
               } else if (response.status === 403) {
-                throw new Error("403: Forbidden access");
+                throw new Error('403: Forbidden access: Du har inte behörighet att visa denna sida. Kontakta administratören om du tror detta är ett misstag.');
               } else if (response.status === 404) {
-                throw new Error("404: Resource not found");
+                throw new Error('404: Resource not found: Sidan du letade efter kunde inte hittas. Kontrollera adressen eller använd sökfunktionen.');
               } else if (response.status === 429) {
-                throw new Error("429: Too Many Requests");
+                throw new Error('429: Too Many Requests: Du har gjort för många förfrågningar på kort tid. Vänta ett ögonblick och försök igen.');
               } else if (response.status === 500) {
-                throw new Error("500: Internal Server Error");
+                throw new Error('500: Internal Server Error: Oj! Ett fel inträffade på servern. Vi arbetar på att lösa problemet. Försök igen om en stund.');
               } else {
                 throw new Error(`"HTTP error! Status: ${response.status}`);
               }
@@ -314,17 +316,17 @@ function createArticles(article) {
 function responseMessage(response){
     switch (response.status) {
         case 400:    
-            throw new Error('400: Bad Request');
+            throw new Error('400: Bad Request: Din förfrågan kunde inte bearbetas. Kontrollera att all information är korrekt och försök igen.');
         case 401:
-            throw new Error('401: Unauthorized');
+            throw new Error('401: Unauthorized: Du har inte rätt behörighet för att få tillgång till detta innehåll.');
         case 403:
-            throw new Error('403: Forbidden access');
+            throw new Error('403: Forbidden access: Du har inte behörighet att visa denna sida. Kontakta administratören om du tror detta är ett misstag.');
         case 404:
-            throw new Error('404: Resource not found');
+            throw new Error('404: Resource not found: Sidan du letade efter kunde inte hittas. Kontrollera adressen eller använd sökfunktionen.');
         case 429:
-            throw new Error('429: Too Many Requests');
+            throw new Error('429: Too Many Requests: Du har gjort för många förfrågningar på kort tid. Vänta ett ögonblick och försök igen.');
         case 500:
-            throw new Error('500: Internal Server Error');
+            throw new Error('500: Internal Server Error: Oj! Ett fel inträffade på servern. Vi arbetar på att lösa problemet. Försök igen om en stund.');
         default:
             throw new Error(`"HTTP error! Status: ${response.status}`);
         }
