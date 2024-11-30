@@ -177,6 +177,9 @@ searchForm.addEventListener("submit", function (event) {
     } else {
       console.log("input is not empty, yay!");
       searchForArticles(searchTerm);
+      document.querySelector('.searchNewsInput').value = '';
+
+
     }
   });
   
