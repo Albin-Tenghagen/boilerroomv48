@@ -136,6 +136,7 @@ const fetchApiResults = async (type = "all") => {
   //------------------------Default News--------------------------------------
 window.addEventListener("DOMContentLoaded", async function () {
     await fetchApiResults("all");
+    document.querySelector('.searchNewsInput').value = '';
   });
   //--------------------------------------------------------------------------
   
@@ -144,22 +145,26 @@ window.addEventListener("DOMContentLoaded", async function () {
   techButton.addEventListener("click", async function () {
     currentPage = 1;
     await fetchApiResults("tech");
+    document.querySelector('.searchNewsInput').value = '';
   
   });
   
   appleButton.addEventListener("click", async function () {
     currentPage = 1;
     await fetchApiResults("apple");
+    document.querySelector('.searchNewsInput').value = '';
   });
   
   teslaButton.addEventListener("click", async function () {
     currentPage = 1;
     await fetchApiResults("tesla");
+    document.querySelector('.searchNewsInput').value = '';
   });
   
   economyButton.addEventListener("click", async function () {
     currentPage = 1;
     await fetchApiResults("economy");
+    document.querySelector('.searchNewsInput').value = '';
   }); 
   //---------------------------------------------------------
   
@@ -257,6 +262,7 @@ function updatePagination(){
 //---------------------------------------------------------
 //------------------Article Creation Function--------------
 function createArticles(article) {
+  
     let articleContainer = document.createElement("article");
     articleContainer.setAttribute("class", "articleContainer");
     articleSection.appendChild(articleContainer);
