@@ -150,10 +150,6 @@ const fetchApiResults = async (type = "all") => {
     console.error("Ett fel/error uppstod: ", error);
   }
 };
-function responseMessage(response) {
-  throw new Error(`Error: ${response.status} - ${response.statusText}`);
-}
-
 //------------------------Default News--------------------------------------
 window.addEventListener("DOMContentLoaded", async function () {
   await fetchApiResults("all");
