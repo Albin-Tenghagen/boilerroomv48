@@ -2,6 +2,7 @@
 const itemsPerPage = 15;
 let currentPage = 1;
 let articleArray = [];
+let policeArticleArray = [];
 let intervalId = setInterval(() => {
   fetchApiResults();
 }, 1000 * 60 * 5);
@@ -37,10 +38,10 @@ economyButton.setAttribute("class", "economyButton");
 economyButton.innerText = "Economy";
 headerContainer.appendChild(economyButton);
 
-let comboButton = document.createElement("button");
-comboButton.setAttribute("class", "comboButton");
-comboButton.innerText = "Combo";
-headerContainer.appendChild(comboButton);
+let topHeadlinesButton = document.createElement("button");
+topHeadlinesButton.setAttribute("class", "topHeadlinesButton");
+topHeadlinesButton.innerText = "TopHeadlines";
+headerContainer.appendChild(topHeadlinesButton);
 //--------------------------------------------------------------------------
 
 //------------Main Creation ------------------------------------------------
@@ -69,6 +70,15 @@ newsContainer.appendChild(errorContainer);
 let articleSection = document.createElement("section");
 articleSection.setAttribute("class", "articleSection");
 newsContainer.appendChild(articleSection);
+
+const articleSection2 = document.createElement("section")
+articleSection2.setAttribute("class", "articleSection2");
+newsContainer.appendChild(articleSection2);
+
+const section2Header = document.createElement("h3")
+section2Header.innerText = "Swedish news from the police:"
+articleSection2.appendChild(section2Header)
+
 //--------------------------------------------------------------------------
 
 //-----------------------------FETCH----------------------------------------
@@ -76,37 +86,42 @@ const fetchApiResults = async (type = "all") => {
   try {
     console.log(type, " is responsive");
     articleSection.replaceChildren();
+    articleSection2.replaceChildren();
     let requests = [];
     let url;
     switch (type) {
-      case "all":
+      case "topHeadlines":
         url =
-          "https://newsapi.org/v2/top-headlines?country=us&language=en&apiKey=1006e9f332db40bd8553b27720785488";
+          "https://newsapi.org/v2/top-headlines?country=us&language=en&apiKey=a5e3e0dc52244181a7517d579bb03bb5";
         break;
 
-      case "combo":
+      case "all":
         requests = [
           fetch(
-            "https://newsapi.org/v2/top-headlines?country=us&language=en&apiKey=1006e9f332db40bd8553b27720785488"
+            "https://newsapi.org/v2/top-headlines?country=us&language=en&apiKey=a5e3e0dc52244181a7517d579bb03bb5"
           ),
           fetch(
-            "https://newsapi.org/v2/top-headlines?language=en&category=business&apiKey=1006e9f332db40bd8553b27720785488"
+            "https://newsapi.org/v2/top-headlines?language=en&category=business&apiKey=a5e3e0dc52244181a7517d579bb03bb5"
           ),
         ];
         break;
 
       case "economyCategory":
         url =
-          "https://newsapi.org/v2/top-headlines?language=en&category=business&apiKey=1006e9f332db40bd8553b27720785488";
+          "https://newsapi.org/v2/top-headlines?language=en&category=business&apiKey=a5e3e0dc52244181a7517d579bb03bb5";
         break;
 
       default:
-        url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(type)}&language=en&from=2024-11-15&sortBy=publishedAt&apiKey=1006e9f332db40bd8553b27720785488`;
+        url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(type)}&language=en&from=2024-11-15&sortBy=publishedAt&apiKey=a5e3e0dc52244181a7517d579bb03bb5`;
         break;
     }
+    
+    if (type === "all") {
+      requests.push(fetch("https://polisen.se/api/events"));
+  }
 
     if (requests.length > 0) {
-      const [headlinesResponse, economyResponse] = await Promise.all(requests);
+      const [economyResponse, headlinesResponse, policeResponse ] = await Promise.all(requests);
 
       if (!headlinesResponse.ok) {
         responseMessage(headlinesResponse);
@@ -114,12 +129,18 @@ const fetchApiResults = async (type = "all") => {
       if (!economyResponse.ok) {
         responseMessage(economyResponse);
       }
+      if (!policeResponse.ok) {
+        responseMessage(policeResponse)
+      }
 
       const headlinesData = await headlinesResponse.json();
       const economyData = await economyResponse.json();
+      const policeData = await policeResponse.json()
 
       articleArray = [...headlinesData.articles, ...economyData.articles];
+      policeArticleArray = policeData;
     } else {
+
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -132,6 +153,7 @@ const fetchApiResults = async (type = "all") => {
 
     console.log("response : ", articleArray);
 
+
     if (articleArray.length === 0) {
       articleSection.innerHTML = "<p>No articles were found<p>";
     } else {
@@ -140,12 +162,20 @@ const fetchApiResults = async (type = "all") => {
       articleArray = await articleArray.filter(
         (article) => article?.content?.toLowerCase() !== "[removed]"
       );
+    if (policeArticleArray.length === 0) {
+      articleSection2.innerHTML = "<p>No articles were found<p>";
+    } else {
+      
+      console.log("policeArray", policeArticleArray)
+      policeArticleArray.forEach((article2) => createArticles2(article2));
+    }
 
       updatePagination();
+      
     }
   } catch (error) {
-    showError("Ett fel uppstod ", error.message);
-    console.error("Ett fel/error uppstod: ", error);
+    showError("An error occured: ", error.message);
+    console.error("An error occured: ", error);
   }
 };
 //------------------------Default News--------------------------------------
@@ -181,9 +211,9 @@ economyButton.addEventListener("click", async function () {
   document.querySelector(".searchNewsInput").value = "";
 });
 
-comboButton.addEventListener("click", async function () {
+topHeadlinesButton.addEventListener("click", async function () {
   currentPage = 1;
-  await fetchApiResults("combo");
+  await fetchApiResults("topHeadlines");
   document.querySelector(".searchNewsInput").value = "";
 });
 
@@ -228,6 +258,8 @@ function displayData(page) {
 
   paginatedData.forEach((article) => createArticles(article));
 }
+
+
 
 function paginationSetup() {
   //* Takes the array of data and divides it with how many itmesPerPage we wanted
@@ -274,6 +306,7 @@ function paginationSetup() {
 //------------------Page Refresh function------------------
 function updatePagination() {
   displayData(currentPage);
+
   paginationSetup();
 }
 //---------------------------------------------------------
@@ -295,10 +328,10 @@ function createArticles(article) {
 
   let timeStamp = document.createElement("p");
   timeStamp.setAttribute("class", "timeStamp");
-  // Formatera tidsstämpeln
-  let publishedAt = article.publishedAt; // Exempel: "2024-11-22T15:30:00Z"
-  let dateAndTime = publishedAt.replace("Z", "").split("T"); // Delar på "T" för att separera datum och tid
-  let formattedTimeStamp = `${dateAndTime[0]} ${dateAndTime[1]}`; // Lägger till mellanrum mellan datum och tid
+  // Format timestamp
+  let publishedAt = article.publishedAt; // Exampel: "2024-11-22T15:30:00Z"
+  let dateAndTime = publishedAt.replace("Z", "").split("T"); // Divides "T" to seperate date and time
+  let formattedTimeStamp = `${dateAndTime[0]} ${dateAndTime[1]}`; // Places a blank space between date and time
   timeStamp.textContent = formattedTimeStamp;
   articleContainer.appendChild(timeStamp);
 
@@ -327,31 +360,64 @@ function createArticles(article) {
   articleContainer.appendChild(readMoreButton);
 }
 //------------------------------------------------------------
+//------------------Article2 Creation Function--------------
+// Name - summary - datetime - url -  
+
+function createArticles2(article2) {
+  let articleContainer2 = document.createElement("article");
+  articleContainer2.setAttribute("class", "articleContainer");
+  articleSection2.appendChild(articleContainer2);
+
+  let articleTitle2 = document.createElement("h3");
+  articleTitle2.textContent = article2.name;
+  articleTitle2.setAttribute("class", "articleTitle");
+  articleContainer2.appendChild(articleTitle2);
+
+  let articleSummary2 = document.createElement("p");
+  articleSummary2.setAttribute("class", "articleSummary");
+  articleSummary2.textContent = article2.summary;
+  articleContainer2.appendChild(articleSummary2);
+
+  let timeStamp2 = document.createElement("p");
+  timeStamp2.setAttribute("class", "timeStamp");
+  timeStamp2.textContent = article2.datetime;
+  articleContainer2.appendChild(timeStamp2);
+
+  let articleAuthor2 = document.createElement("p");
+  articleAuthor2.setAttribute("class", "articleAuthor");
+  articleAuthor2.textContent = article2.id;
+  articleContainer2.appendChild(articleAuthor2);
+
+}
+
+
+
+//------------------------------------------------------------
 function responseMessage(response) {
   switch (response.status) {
     case 400:
       throw new Error(
-        "400: Bad Request: Din förfrågan kunde inte bearbetas. Kontrollera att all information är korrekt och försök igen."
+        "400: Bad Request: Your request could not be processed. Please check that all information is correct and try again."
       );
     case 401:
       throw new Error(
-        "401: Unauthorized: Du har inte rätt behörighet för att få tillgång till detta innehåll."
+        "401: Unauthorized: You do not have the proper authorization to access this content."
       );
     case 403:
       throw new Error(
-        "403: Forbidden access: Du har inte behörighet att visa denna sida. Kontakta administratören om du tror detta är ett misstag."
+        "403: Forbidden access: You are not authorized to view this page. Contact the administrator if you believe this is a mistake."
       );
     case 404:
       throw new Error(
-        "404: Resource not found: Sidan du letade efter kunde inte hittas. Kontrollera adressen eller använd sökfunktionen."
+        "404: Resource not found: The page you were looking for could not be found. Check the address or use the search function."
       );
     case 429:
       throw new Error(
-        "429: Too Many Requests: Du har gjort för många förfrågningar på kort tid. Vänta ett ögonblick och försök igen."
+        "429: Too Many Requests: You have made too many requests in a short period. Please wait a moment and try again."
       );
     case 500:
       throw new Error(
-        "500: Internal Server Error: Oj! Ett fel inträffade på servern. Vi arbetar på att lösa problemet. Försök igen om en stund."
+        "500: Internal Server Error: Oops! An error occurred on the server. We're working to resolve the issue. Please try again later."
       );
     default:
       throw new Error(`"HTTP error! Status: ${response.status}`);
