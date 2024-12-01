@@ -167,7 +167,13 @@ const fetchApiResults = async (type = "all") => {
     } else {
       
       console.log("policeArray", policeArticleArray)
-      policeArticleArray.forEach((article2) => createArticles2(article2));
+
+        
+      const limitedPoliceArticles = policeArticleArray.slice(0, 20);
+
+      limitedPoliceArticles.forEach((article2) => createArticles2(article2));
+    
+    
     }
 
       updatePagination();
