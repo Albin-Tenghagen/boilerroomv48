@@ -117,7 +117,6 @@ const fetchApiResults = async (type = "all") => {
         )}&language=en&from=2024-11-15&sortBy=publishedAt&apiKey=a5e3e0dc52244181a7517d579bb03bb5`;
         break;
     }
-
     if (type === "all") {
       requests.push(fetch("https://polisen.se/api/events"));
     }
@@ -142,6 +141,15 @@ const fetchApiResults = async (type = "all") => {
 
       articleArray = [...headlinesData.articles, ...economyData.articles];
       policeArticleArray = policeData;
+
+      if (policeArticleArray.length === 0) {
+        articleSection2.innerHTML = "<p>No articles were found<p>";
+      } else {
+        console.log("policeArray", policeArticleArray);
+
+        const limitedPoliceArticles = policeArticleArray.slice(0, 20);
+        limitedPoliceArticles.forEach((article2) => createArticles2(article2));
+      }
     } else {
       const response = await fetch(url);
 
@@ -161,14 +169,6 @@ const fetchApiResults = async (type = "all") => {
       articleArray = await articleArray.filter(
         (article) => article?.content?.toLowerCase() !== "[removed]"
       );
-      if (policeArticleArray.length === 0) {
-        articleSection2.innerHTML = "<p>No articles were found<p>";
-      } else {
-        console.log("policeArray", policeArticleArray);
-
-        const limitedPoliceArticles = policeArticleArray.slice(0, 20);
-        limitedPoliceArticles.forEach((article2) => createArticles2(article2));
-      }
 
       updatePagination();
     }
