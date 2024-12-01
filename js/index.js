@@ -95,15 +95,13 @@ const fetchApiResults = async (type = "all") => {
         ];
         break;
 
-      case "economy":
+      case "economyCategory":
         url =
           "https://newsapi.org/v2/top-headlines?language=en&category=business&apiKey=1006e9f332db40bd8553b27720785488";
         break;
 
       default:
-        url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(
-          type
-        )}&language=en&from=2024-11-15&sortBy=publishedAt&apiKey=1006e9f332db40bd8553b27720785488`;
+        url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(type)}&language=en&from=2024-11-15&sortBy=publishedAt&apiKey=1006e9f332db40bd8553b27720785488`;
         break;
     }
 
@@ -179,7 +177,7 @@ teslaButton.addEventListener("click", async function () {
 
 economyButton.addEventListener("click", async function () {
   currentPage = 1;
-  await fetchApiResults("economy");
+  await fetchApiResults("economyCategory");
   document.querySelector(".searchNewsInput").value = "";
 });
 
