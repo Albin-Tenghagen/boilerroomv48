@@ -71,13 +71,13 @@ let articleSection = document.createElement("section");
 articleSection.setAttribute("class", "articleSection");
 newsContainer.appendChild(articleSection);
 
-const articleSection2 = document.createElement("section")
+const articleSection2 = document.createElement("section");
 articleSection2.setAttribute("class", "articleSection2");
 newsContainer.appendChild(articleSection2);
 
-const section2Header = document.createElement("h3")
-section2Header.innerText = "Swedish news from the police:"
-articleSection2.appendChild(section2Header)
+const section2Header = document.createElement("h3");
+section2Header.innerText = "Swedish news from the police:";
+articleSection2.appendChild(section2Header);
 
 //--------------------------------------------------------------------------
 
@@ -112,16 +112,19 @@ const fetchApiResults = async (type = "all") => {
         break;
 
       default:
-        url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(type)}&language=en&from=2024-11-15&sortBy=publishedAt&apiKey=a5e3e0dc52244181a7517d579bb03bb5`;
+        url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(
+          type
+        )}&language=en&from=2024-11-15&sortBy=publishedAt&apiKey=a5e3e0dc52244181a7517d579bb03bb5`;
         break;
     }
-    
+
     if (type === "all") {
       requests.push(fetch("https://polisen.se/api/events"));
-  }
+    }
 
     if (requests.length > 0) {
-      const [economyResponse, headlinesResponse, policeResponse ] = await Promise.all(requests);
+      const [economyResponse, headlinesResponse, policeResponse] =
+        await Promise.all(requests);
 
       if (!headlinesResponse.ok) {
         responseMessage(headlinesResponse);
@@ -130,17 +133,16 @@ const fetchApiResults = async (type = "all") => {
         responseMessage(economyResponse);
       }
       if (!policeResponse.ok) {
-        responseMessage(policeResponse)
+        responseMessage(policeResponse);
       }
 
       const headlinesData = await headlinesResponse.json();
       const economyData = await economyResponse.json();
-      const policeData = await policeResponse.json()
+      const policeData = await policeResponse.json();
 
       articleArray = [...headlinesData.articles, ...economyData.articles];
       policeArticleArray = policeData;
     } else {
-
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -151,9 +153,6 @@ const fetchApiResults = async (type = "all") => {
       articleArray = data.articles;
     }
 
-    console.log("response : ", articleArray);
-
-
     if (articleArray.length === 0) {
       articleSection.innerHTML = "<p>No articles were found<p>";
     } else {
@@ -162,22 +161,16 @@ const fetchApiResults = async (type = "all") => {
       articleArray = await articleArray.filter(
         (article) => article?.content?.toLowerCase() !== "[removed]"
       );
-    if (policeArticleArray.length === 0) {
-      articleSection2.innerHTML = "<p>No articles were found<p>";
-    } else {
-      
-      console.log("policeArray", policeArticleArray)
+      if (policeArticleArray.length === 0) {
+        articleSection2.innerHTML = "<p>No articles were found<p>";
+      } else {
+        console.log("policeArray", policeArticleArray);
 
-        
-      const limitedPoliceArticles = policeArticleArray.slice(0, 20);
-
-      limitedPoliceArticles.forEach((article2) => createArticles2(article2));
-    
-    
-    }
+        const limitedPoliceArticles = policeArticleArray.slice(0, 20);
+        limitedPoliceArticles.forEach((article2) => createArticles2(article2));
+      }
 
       updatePagination();
-      
     }
   } catch (error) {
     showError("An error occured: ", error.message);
@@ -264,8 +257,6 @@ function displayData(page) {
 
   paginatedData.forEach((article) => createArticles(article));
 }
-
-
 
 function paginationSetup() {
   //* Takes the array of data and divides it with how many itmesPerPage we wanted
@@ -367,7 +358,6 @@ function createArticles(article) {
 }
 //------------------------------------------------------------
 //------------------Article2 Creation Function--------------
-// Name - summary - datetime - url -  
 
 function createArticles2(article2) {
   let articleContainer2 = document.createElement("article");
@@ -393,10 +383,7 @@ function createArticles2(article2) {
   articleAuthor2.setAttribute("class", "articleAuthor");
   articleAuthor2.textContent = article2.id;
   articleContainer2.appendChild(articleAuthor2);
-
 }
-
-
 
 //------------------------------------------------------------
 function responseMessage(response) {
