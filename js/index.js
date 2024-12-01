@@ -70,6 +70,7 @@ const fetchApiResults = async (type = "all") => {
     try {
       console.log(type, " is responsive");
       articleSection.replaceChildren();
+      let requests = [];
       let url;
       switch (type) {
         case "all":
@@ -89,16 +90,26 @@ const fetchApiResults = async (type = "all") => {
               break;
             }
             
-            const response = await fetch(url);
+            if(url) {
+              requests.push(fetch(url));
+            }
+
+            requests.push(fetch("//https://polisen.se/api/events"))
+
+            const responses = await Promise.all(requests);
             
+            for(let response of responses) {
             if (!response.ok) {
               // Felhantering baserat på statuskod
               responseMessage(response)
             }
-            const data = await response.json();
-            articleArray = data.articles;
-            
-            console.log("response : ", data);
+          }
+            const [mainData, policeData ] = await Promise.all(responses.map(response => response.json()));
+            articleArray = mainData.articles;
+            policeArticleArray = policeData;
+
+
+            console.log(`articleArray: ${articleArray} / policearticleArray: ${policeArticleArray}`);
             
             
             if (articleArray.length === 0) {
