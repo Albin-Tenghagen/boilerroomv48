@@ -71,13 +71,17 @@ let articleSection = document.createElement("section");
 articleSection.setAttribute("class", "articleSection");
 newsContainer.appendChild(articleSection);
 
+
+const section2Header = document.createElement("h1");
+section2Header.setAttribute("class", "section2Header")
+section2Header.innerText = "Swedish news from the police:";
+newsContainer.appendChild(section2Header);
+
 const articleSection2 = document.createElement("section");
 articleSection2.setAttribute("class", "articleSection2");
 newsContainer.appendChild(articleSection2);
 
-const section2Header = document.createElement("h3");
-section2Header.innerText = "Swedish news from the police:";
-articleSection2.appendChild(section2Header);
+
 
 //--------------------------------------------------------------------------
 
@@ -120,6 +124,7 @@ const fetchApiResults = async (type = "all") => {
     if (type === "all") {
       requests.push(fetch("https://polisen.se/api/events"));
     }
+    
 
     if (requests.length > 0) {
       const [economyResponse, headlinesResponse, policeResponse] =
@@ -188,30 +193,35 @@ window.addEventListener("DOMContentLoaded", async function () {
 
 techButton.addEventListener("click", async function () {
   currentPage = 1;
+  document.querySelector(".section2Header").style.display = "none";
   await fetchApiResults("tech");
   document.querySelector(".searchNewsInput").value = "";
 });
 
 appleButton.addEventListener("click", async function () {
   currentPage = 1;
+  document.querySelector(".section2Header").style.display = "none";
   await fetchApiResults("apple");
   document.querySelector(".searchNewsInput").value = "";
 });
 
 teslaButton.addEventListener("click", async function () {
   currentPage = 1;
+  document.querySelector(".section2Header").style.display = "none";
   await fetchApiResults("tesla");
   document.querySelector(".searchNewsInput").value = "";
 });
 
 economyButton.addEventListener("click", async function () {
   currentPage = 1;
+  document.querySelector(".section2Header").style.display = "none";
   await fetchApiResults("economyCategory");
   document.querySelector(".searchNewsInput").value = "";
 });
 
 topHeadlinesButton.addEventListener("click", async function () {
   currentPage = 1;
+  document.querySelector(".section2Header").style.display = "none";
   await fetchApiResults("topHeadlines");
   document.querySelector(".searchNewsInput").value = "";
 });
@@ -233,7 +243,8 @@ searchForm.addEventListener("submit", function (event) {
     console.log("input is not empty, yay!");
     searchForArticles(searchTerm);
     document.querySelector(".searchNewsInput").value = "";
-  }
+    document.querySelector(".section2Header").style.display = "none";
+  } 
 });
 
 async function searchForArticles(query) {
@@ -360,6 +371,8 @@ function createArticles(article) {
 //------------------Article2 Creation Function--------------
 
 function createArticles2(article2) {
+
+  
   let articleContainer2 = document.createElement("article");
   articleContainer2.setAttribute("class", "articleContainer");
   articleSection2.appendChild(articleContainer2);
