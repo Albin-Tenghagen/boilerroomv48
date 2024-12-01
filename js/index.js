@@ -94,7 +94,7 @@ const fetchApiResults = async (type = "all") => {
               requests.push(fetch(url));
             }
 
-            requests.push(fetch("//https://polisen.se/api/events"))
+            requests.push(fetch("https://polisen.se/api/events"))
 
             const responses = await Promise.all(requests);
             
