@@ -18,6 +18,11 @@ headingHeader.setAttribute("class", "headingHeader");
 headingHeader.innerText = "Welcome to the latest news";
 headerContainer.appendChild(headingHeader);
 
+let homeButton = document.createElement("button");
+homeButton.setAttribute("class", "homeButton");
+homeButton.innerText = "Home";
+headerContainer.appendChild(homeButton);
+
 let techButton = document.createElement("button");
 techButton.setAttribute("class", "techButton");
 techButton.innerText = "Tech";
@@ -198,6 +203,12 @@ window.addEventListener("DOMContentLoaded", async function () {
 //--------------------------------------------------------------------------
 
 //------------------Category Selection--------------------------------------
+
+homeButton.addEventListener("click", async function () {
+  currentPage = 1;
+  await fetchApiResults("all");
+  document.querySelector(".searchNewsInput").value = "";
+});
 
 techButton.addEventListener("click", async function () {
   currentPage = 1;
