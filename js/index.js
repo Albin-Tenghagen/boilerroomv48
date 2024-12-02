@@ -1,4 +1,4 @@
-//*--------------------Global variabels-------------------------------------
+//*--------------------Global variables-------------------------------------
 const itemsPerPage = 15;
 let currentPage = 1;
 let articleArray = [];
@@ -71,9 +71,8 @@ let articleSection = document.createElement("section");
 articleSection.setAttribute("class", "articleSection");
 newsContainer.appendChild(articleSection);
 
-
 const section2Header = document.createElement("h1");
-section2Header.setAttribute("class", "section2Header")
+section2Header.setAttribute("class", "section2Header");
 section2Header.innerText = "Swedish news from the police:";
 newsContainer.appendChild(section2Header);
 
@@ -81,112 +80,100 @@ const articleSection2 = document.createElement("section");
 articleSection2.setAttribute("class", "articleSection2");
 newsContainer.appendChild(articleSection2);
 
-
-
 //--------------------------------------------------------------------------
 
 //-----------------------------FETCH----------------------------------------
+
 const fetchApiResults = async (type = "all") => {
   try {
     console.log(type, " is responsive");
     articleSection.replaceChildren();
     articleSection2.replaceChildren();
+    
     let requests = [];
     let url;
+
     switch (type) {
       case "topHeadlines":
         url =
-          "https://newsapi.org/v2/top-headlines?country=us&language=en&apiKey=a5e3e0dc52244181a7517d579bb03bb5";
+          "https://newsapi.org/v2/top-headlines?country=us&language=en&apiKey=a5e3e0dc52244181a7517d579bb03bb";
         break;
-
       case "all":
         requests = [
-          fetch(
+          axios.get(
             "https://newsapi.org/v2/top-headlines?country=us&language=en&apiKey=a5e3e0dc52244181a7517d579bb03bb5"
           ),
-          fetch(
+          axios.get(
             "https://newsapi.org/v2/top-headlines?language=en&category=business&apiKey=a5e3e0dc52244181a7517d579bb03bb5"
           ),
+          axios.get("https://polisen.se/api/events"),
         ];
         break;
-
       case "economyCategory":
         url =
           "https://newsapi.org/v2/top-headlines?language=en&category=business&apiKey=a5e3e0dc52244181a7517d579bb03bb5";
         break;
-
       default:
         url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(
           type
         )}&language=en&from=2024-11-15&sortBy=publishedAt&apiKey=a5e3e0dc52244181a7517d579bb03bb5`;
         break;
     }
+
     if (type === "all") {
-      requests.push(fetch("https://polisen.se/api/events"));
-    }
-    
+      // Use await to wait for all API requests
+      const [headlinesResponse, economyResponse, policeResponse] = await Promise.all(requests);
+      
+      articleArray = [
+        ...headlinesResponse.data.articles,
+        ...economyResponse.data.articles,
+      ];
+      policeArticleArray = policeResponse.data;
 
-    if (requests.length > 0) {
-      const [economyResponse, headlinesResponse, policeResponse] =
-        await Promise.all(requests);
-
-      if (!headlinesResponse.ok) {
-        responseMessage(headlinesResponse);
-      }
-      if (!economyResponse.ok) {
-        responseMessage(economyResponse);
-      }
-      if (!policeResponse.ok) {
-        responseMessage(policeResponse);
-      }
-
-      const headlinesData = await headlinesResponse.json();
-      const economyData = await economyResponse.json();
-      const policeData = await policeResponse.json();
-
-      articleArray = [...headlinesData.articles, ...economyData.articles];
-      policeArticleArray = policeData;
-
+      // Check if we have police articles and create these articles
       if (policeArticleArray.length === 0) {
         articleSection2.innerHTML = "<p>No articles were found<p>";
       } else {
-        console.log("policeArray", policeArticleArray);
-
         const limitedPoliceArticles = policeArticleArray.slice(0, 20);
         limitedPoliceArticles.forEach((article2) => createArticles2(article2));
       }
-    } else {
-      const response = await fetch(url);
 
-      if (!response.ok) {
-        responseMessage(response);
+      // If we don't find any articles, show a message
+      if (articleArray.length === 0) {
+        articleSection.innerHTML = "<p>No articles were found<p>";
+      } else {
+        articleArray = articleArray.filter(
+          (article) => article?.content?.toLowerCase() !== "[removed]"
+        );
+        updatePagination();  // Update pagination when articles are fetched
       }
-
-      const data = await response.json();
-      articleArray = data.articles;
-    }
-
-    if (articleArray.length === 0) {
-      articleSection.innerHTML = "<p>No articles were found<p>";
     } else {
-      console.log("articleArray", articleArray);
-
-      articleArray = await articleArray.filter(
-        (article) => article?.content?.toLowerCase() !== "[removed]"
-      );
-
-      updatePagination();
+      // If the type is not "all", make a single API request
+      const response = await axios.get(url);
+      articleArray = response.data.articles;
+      if (articleArray.length === 0) {
+        articleSection.innerHTML = "<p>No articles were found<p>";
+      } else {
+        articleArray = articleArray.filter(
+          (article) => article?.content?.toLowerCase() !== "[removed]"
+        );
+        updatePagination();  // Update pagination when articles are fetched
+      }
     }
   } catch (error) {
-    showError("An error occured: ", error.message);
-    console.error("An error occured: ", error);
+    showError("An error occurred: ", error.response?.statusText || error.message);
+    console.error(error);
   }
 };
+
 //------------------------Default News--------------------------------------
 window.addEventListener("DOMContentLoaded", async function () {
   await fetchApiResults("all");
   document.querySelector(".searchNewsInput").value = "";
 });
+
+// Resten av koden, inklusive event listeners och hjälpmetoder, är samma som i din ursprungliga kod.
+
 //--------------------------------------------------------------------------
 
 //------------------Category Selection--------------------------------------
@@ -398,40 +385,7 @@ function createArticles2(article2) {
   articleContainer2.appendChild(articleAuthor2);
 }
 
-//------------------------------------------------------------
-function responseMessage(response) {
-  switch (response.status) {
-    case 400:
-      throw new Error(
-        "400: Bad Request: Your request could not be processed. Please check that all information is correct and try again."
-      );
-    case 401:
-      throw new Error(
-        "401: Unauthorized: You do not have the proper authorization to access this content."
-      );
-    case 403:
-      throw new Error(
-        "403: Forbidden access: You are not authorized to view this page. Contact the administrator if you believe this is a mistake."
-      );
-    case 404:
-      throw new Error(
-        "404: Resource not found: The page you were looking for could not be found. Check the address or use the search function."
-      );
-    case 429:
-      throw new Error(
-        "429: Too Many Requests: You have made too many requests in a short period. Please wait a moment and try again."
-      );
-    case 500:
-      throw new Error(
-        "500: Internal Server Error: Oops! An error occurred on the server. We're working to resolve the issue. Please try again later."
-      );
-    default:
-      throw new Error(`"HTTP error! Status: ${response.status}`);
-  }
-}
-
-//------------------------------------------------------------
-
+//------------------ShowError funciton-----------------
 function showError(...messages) {
   // Get the error container
   const errorContainer = document.getElementById("errorContainer");
@@ -448,3 +402,6 @@ function showError(...messages) {
     errorContainer.textContent = ""; // Clear the error message
   }, 5000); // Adjust the duration (5000ms = 5 seconds) as needed
 }
+
+//------------------------------------------------------------
+
