@@ -71,28 +71,28 @@ let articleSection = document.createElement("section");
 articleSection.setAttribute("class", "articleSection");
 newsContainer.appendChild(articleSection);
 
-
 const section2Header = document.createElement("h1");
-section2Header.setAttribute("class", "section2Header")
-section2Header.innerText = "Swedish news from the police:";
+section2Header.setAttribute("class", "section2Header");
+section2Header.innerText = "news from swedish police, Time to train!";
 newsContainer.appendChild(section2Header);
 
 const articleSection2 = document.createElement("section");
 articleSection2.setAttribute("class", "articleSection2");
 newsContainer.appendChild(articleSection2);
 
-
-
 //--------------------------------------------------------------------------
 
 //-----------------------------FETCH----------------------------------------
+// assigns the function with (type = "all") so that we can change this value for different results later.
 const fetchApiResults = async (type = "all") => {
   try {
     console.log(type, " is responsive");
+    // empties the article section everytime the function runs.
     articleSection.replaceChildren();
     articleSection2.replaceChildren();
     let requests = [];
     let url;
+    //switch case to check which "type" runs.
     switch (type) {
       case "topHeadlines":
         url =
@@ -102,7 +102,7 @@ const fetchApiResults = async (type = "all") => {
       case "all":
         requests = [
           fetch(
-            "https://newsapi.org/v2/top-headlines?country=us&language=en&apiKey=a5e3e0dc52244181a7517d579bb03bb5"
+            "https://newsapi.org/v2/top-headlines?country=us&language=en&apiKey=a5e3e0dc52244181a7517d579bb03bb"
           ),
           fetch(
             "https://newsapi.org/v2/top-headlines?language=en&category=business&apiKey=a5e3e0dc52244181a7517d579bb03bb5"
@@ -121,15 +121,18 @@ const fetchApiResults = async (type = "all") => {
         )}&language=en&from=2024-11-15&sortBy=publishedAt&apiKey=a5e3e0dc52244181a7517d579bb03bb5`;
         break;
     }
+
+    // if we run the "all" type, then this will push a fetch api into the requests array.
     if (type === "all") {
       requests.push(fetch("https://polisen.se/api/events"));
     }
-    
 
+    // once code is executed, Promise.all runs them at the same time and awaits so that they are all resolved. if any of them rejects, all of them rejects.
     if (requests.length > 0) {
       const [economyResponse, headlinesResponse, policeResponse] =
         await Promise.all(requests);
 
+      // if a response is NOT ok, then it will call the responseMessage function.
       if (!headlinesResponse.ok) {
         responseMessage(headlinesResponse);
       }
@@ -140,11 +143,13 @@ const fetchApiResults = async (type = "all") => {
         responseMessage(policeResponse);
       }
 
+      //If the responses was recieved succesfully, they will then be parsed to javascript objects and stored in the respective variable
       const headlinesData = await headlinesResponse.json();
       const economyData = await economyResponse.json();
       const policeData = await policeResponse.json();
-
+      // combines headlinesData.articles with economyData.articles into one array.
       articleArray = [...headlinesData.articles, ...economyData.articles];
+      // separates the news from the police API into another array
       policeArticleArray = policeData;
 
       if (policeArticleArray.length === 0) {
@@ -152,10 +157,12 @@ const fetchApiResults = async (type = "all") => {
       } else {
         console.log("policeArray", policeArticleArray);
 
+        // limits the amount of articles visible on the site to 20 starting from 0. it still fetches 500 articles though..
         const limitedPoliceArticles = policeArticleArray.slice(0, 20);
         limitedPoliceArticles.forEach((article2) => createArticles2(article2));
       }
     } else {
+      // paused execution until fetch promise resolved.
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -171,6 +178,7 @@ const fetchApiResults = async (type = "all") => {
     } else {
       console.log("articleArray", articleArray);
 
+      // filters the array so that every "article.content ["Removed"] is filtered away.
       articleArray = await articleArray.filter(
         (article) => article?.content?.toLowerCase() !== "[removed]"
       );
@@ -244,7 +252,7 @@ searchForm.addEventListener("submit", function (event) {
     searchForArticles(searchTerm);
     document.querySelector(".searchNewsInput").value = "";
     document.querySelector(".section2Header").style.display = "none";
-  } 
+  }
 });
 
 async function searchForArticles(query) {
@@ -278,7 +286,7 @@ function paginationSetup() {
   pageControls.setAttribute("class", "pageControls");
   articleSection.appendChild(pageControls);
 
-  //* when a prevButton or Next button is clicked. it checks if it is on the last
+  //* when a prevButton or Next button is clicked. it checks if it is on the last or  the first page, in that case the respective buttons wont work. so the display wont crack.
   const prevButton = document.createElement("button");
   prevButton.textContent = "Previous Page";
   prevButton.setAttribute("class", "prevButton");
@@ -293,6 +301,7 @@ function paginationSetup() {
     }
   });
 
+  //*Shows what page the user is on currently viewing
   const pageButton = document.createElement("button");
   pageButton.setAttribute("class", "pageButton");
   pageButton.textContent = `${currentPage} / ${amountOfPages}`;
@@ -313,8 +322,10 @@ function paginationSetup() {
 
 //------------------Page Refresh function------------------
 function updatePagination() {
+  //Calls the function to display what different parts of the article array in slices
   displayData(currentPage);
 
+  //Sets up the pagination system every time it gets called to avoid double controls and/or other errors
   paginationSetup();
 }
 //---------------------------------------------------------
@@ -371,8 +382,6 @@ function createArticles(article) {
 //------------------Article2 Creation Function--------------
 
 function createArticles2(article2) {
-
-  
   let articleContainer2 = document.createElement("article");
   articleContainer2.setAttribute("class", "articleContainer");
   articleSection2.appendChild(articleContainer2);
@@ -431,10 +440,12 @@ function responseMessage(response) {
 }
 
 //------------------------------------------------------------
-
+// spread operator which makes it possible to accept any number of arguments and collects them into an array.
 function showError(...messages) {
   // Get the error container
   const errorContainer = document.getElementById("errorContainer");
+
+  // concatenates all elements of the array into a single string.
   const fullMessage = messages.join("");
   // Set the error message
   errorContainer.textContent = fullMessage;
@@ -442,9 +453,9 @@ function showError(...messages) {
   // Show the container
   errorContainer.style.display = "block";
 
-  // Optionally, hide the error after a few seconds
+  // hides the error after a few seconds
   setTimeout(() => {
     errorContainer.style.display = "none";
-    errorContainer.textContent = ""; // Clear the error message
-  }, 5000); // Adjust the duration (5000ms = 5 seconds) as needed
+    errorContainer.textContent = ""; // Clears the error message
+  }, 5000); // 5 seconds
 }
