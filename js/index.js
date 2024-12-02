@@ -102,7 +102,7 @@ const fetchApiResults = async (type = "all") => {
       case "all":
         requests = [
           fetch(
-            "https://newsapi.org/v2/top-headlines?country=us&language=en&apiKey=a5e3e0dc52244181a7517d579bb03bb"
+            "https://newsapi.org/v2/top-headlines?country=us&language=en&apiKey=a5e3e0dc52244181a7517d579bb03bb5"
           ),
           fetch(
             "https://newsapi.org/v2/top-headlines?language=en&category=business&apiKey=a5e3e0dc52244181a7517d579bb03bb5"
