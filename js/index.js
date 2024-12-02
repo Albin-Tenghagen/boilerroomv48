@@ -149,9 +149,13 @@ const fetchApiResults = async (type = "all") => {
       }
 
       //If the responses was recieved succesfully, they will then be parsed to javascript objects and stored in the respective variable
-      const headlinesData = await headlinesResponse.json();
-      const economyData = await economyResponse.json();
-      const policeData = await policeResponse.json();
+      // with Promise.all() the code parses everything at the same time (which is faster than one by one.) before moving on with the code.
+      const [headlinesData, economyData, policeData] = await Promise.all([
+        headlinesResponse.json(),
+        economyResponse.json(),
+        policeResponse.json(),
+      ]);
+
       // combines headlinesData.articles with economyData.articles into one array.
       articleArray = [...headlinesData.articles, ...economyData.articles];
       // separates the news from the police API into another array
