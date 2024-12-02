@@ -3,6 +3,8 @@ const itemsPerPage = 15;
 let currentPage = 1;
 let articleArray = [];
 let policeArticleArray = [];
+let cancelSource = null;  // Declare a global variable to store the cancel token
+let lastTopic = "";  // Variable to track the last topic clicked by the user
 let intervalId = setInterval(() => {
   fetchApiResults();
 }, 1000 * 60 * 5);
@@ -84,42 +86,51 @@ newsContainer.appendChild(articleSection2);
 
 //-----------------------------FETCH----------------------------------------
 
+
 const fetchApiResults = async (type = "all") => {
+  // Check if the user clicked the same topic as before
+  if (type === lastTopic) {
+    console.log(`Already fetching results for "${type}"`);
+    return; // Deny API call if the topic is the same
+  }
+
+  // Cancel any ongoing request
+  if (cancelSource) {
+    cancelSource.cancel("Request cancelled due to a new one.");
+  }
+
+  // Create a new CancelToken for the new request
+  cancelSource = axios.CancelToken.source();
+  
   try {
-    console.log(type, " is responsive");
+    console.log(type, "is responsive");
     articleSection.replaceChildren();
     articleSection2.replaceChildren();
     
     let requests = [];
     let url;
 
+    // Set URL based on the type (category)
     switch (type) {
       case "topHeadlines":
-        url =
-          "https://newsapi.org/v2/top-headlines?country=us&language=en&apiKey=a5e3e0dc52244181a7517d579bb03bb";
+        url = "https://newsapi.org/v2/top-headlines?country=us&language=en&apiKey=a5e3e0dc52244181a7517d579bb03bb5";
         break;
       case "all":
         requests = [
-          axios.get(
-            "https://newsapi.org/v2/top-headlines?country=us&language=en&apiKey=a5e3e0dc52244181a7517d579bb03bb5"
-          ),
-          axios.get(
-            "https://newsapi.org/v2/top-headlines?language=en&category=business&apiKey=a5e3e0dc52244181a7517d579bb03bb5"
-          ),
-          axios.get("https://polisen.se/api/events"),
+          axios.get("https://newsapi.org/v2/top-headlines?country=us&language=en&apiKey=a5e3e0dc52244181a7517d579bb03bb5", { cancelToken: cancelSource.token }),
+          axios.get("https://newsapi.org/v2/top-headlines?language=en&category=business&apiKey=a5e3e0dc52244181a7517d579bb03bb5", { cancelToken: cancelSource.token }),
+          axios.get("https://polisen.se/api/events", { cancelToken: cancelSource.token }),
         ];
         break;
       case "economyCategory":
-        url =
-          "https://newsapi.org/v2/top-headlines?language=en&category=business&apiKey=a5e3e0dc52244181a7517d579bb03bb5";
+        url = "https://newsapi.org/v2/top-headlines?language=en&category=business&apiKey=a5e3e0dc52244181a7517d579bb03bb5";
         break;
       default:
-        url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(
-          type
-        )}&language=en&from=2024-11-15&sortBy=publishedAt&apiKey=a5e3e0dc52244181a7517d579bb03bb5`;
+        url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(type)}&language=en&from=2024-11-15&sortBy=publishedAt&apiKey=a5e3e0dc52244181a7517d579bb03bb5`;
         break;
     }
 
+    // Perform API request(s)
     if (type === "all") {
       // Use await to wait for all API requests
       const [headlinesResponse, economyResponse, policeResponse] = await Promise.all(requests);
@@ -142,42 +153,41 @@ const fetchApiResults = async (type = "all") => {
       if (articleArray.length === 0) {
         articleSection.innerHTML = "<p>No articles were found<p>";
       } else {
-        articleArray = articleArray.filter(
-          (article) => article?.content?.toLowerCase() !== "[removed]"
-        );
+        articleArray = articleArray.filter((article) => article?.content?.toLowerCase() !== "[removed]");
         updatePagination();  // Update pagination when articles are fetched
       }
     } else {
       // If the type is not "all", make a single API request
-      const response = await axios.get(url);
+      const response = await axios.get(url, { cancelToken: cancelSource.token });
       articleArray = response.data.articles;
       if (articleArray.length === 0) {
         articleSection.innerHTML = "<p>No articles were found<p>";
       } else {
-        articleArray = articleArray.filter(
-          (article) => article?.content?.toLowerCase() !== "[removed]"
-        );
+        articleArray = articleArray.filter((article) => article?.content?.toLowerCase() !== "[removed]");
         updatePagination();  // Update pagination when articles are fetched
       }
     }
+
+    // Update lastTopic to prevent repeated requests
+    lastTopic = type;
+
   } catch (error) {
-    showError("An error occurred: ", error.response?.statusText || error.message);
-    console.error(error);
+    // Handle cancellation error
+    if (axios.isCancel(error)) {
+      console.log("Request cancelled:", error.message);
+    } else {
+      showError("An error occurred: ", error.response?.statusText || error.message);
+      console.error(error);
+    }
   }
 };
 
-//------------------------Default News--------------------------------------
 window.addEventListener("DOMContentLoaded", async function () {
   await fetchApiResults("all");
   document.querySelector(".searchNewsInput").value = "";
 });
 
-// Resten av koden, inklusive event listeners och hjälpmetoder, är samma som i din ursprungliga kod.
-
-//--------------------------------------------------------------------------
-
-//------------------Category Selection--------------------------------------
-
+// Event listeners for buttons
 techButton.addEventListener("click", async function () {
   currentPage = 1;
   document.querySelector(".section2Header").style.display = "none";
@@ -212,6 +222,7 @@ topHeadlinesButton.addEventListener("click", async function () {
   await fetchApiResults("topHeadlines");
   document.querySelector(".searchNewsInput").value = "";
 });
+
 
 //---------------------------------------------------------
 
@@ -404,4 +415,3 @@ function showError(...messages) {
 }
 
 //------------------------------------------------------------
-
