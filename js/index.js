@@ -91,6 +91,7 @@ const fetchApiResults = async (type = "all") => {
   // Check if the user clicked the same topic as before
   if (type === lastTopic) {
     console.log(`Already fetching results for "${type}"`);
+    showError(`Already fetching results for "${type}"`);
     return; // Deny API call if the topic is the same
   }
 
@@ -110,7 +111,7 @@ const fetchApiResults = async (type = "all") => {
     let requests = [];
     let url;
 
-    // Set URL based on the type (category)
+
     switch (type) {
       case "topHeadlines":
         url = "https://newsapi.org/v2/top-headlines?country=us&language=en&apiKey=a5e3e0dc52244181a7517d579bb03bb5";
@@ -175,6 +176,7 @@ const fetchApiResults = async (type = "all") => {
     // Handle cancellation error
     if (axios.isCancel(error)) {
       console.log("Request cancelled:", error.message);
+      showError("Request cancelled:", error.message)
     } else {
       showError("An error occurred: ", error.response?.statusText || error.message);
       console.error(error);
