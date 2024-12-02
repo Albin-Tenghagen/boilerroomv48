@@ -1,58 +1,13 @@
-Krav för Projektet
-Grundläggande Funktionalitet
-1. Omstrukturera Datahämtning med Promises
-Refaktorisera era befintliga fetch()-anrop för att använda Promises.
-Säkerställ att alla nätverksförfrågningar hanteras med Promises.
-Använd .then() och .catch() för att hantera lyckade förfrågningar och fel.
+Api fetch från polisAPI är implementerad, och promise.all har integrerats i fetchApiResults för att skapa en asynkron funktion som förbättrar prestandan. På grund av promise.all och await så kan fetch requesten köras parallelt med varandra.
 
-2. Implementera Async/Await
-Skriv om era Promise-kedjor med async/await för att förenkla koden.
-Använd async-funktioner och await-operatorn för att hantera asynkrona operationer.
-Implementera try och catch för att hantera fel i asynkrona funktioner.
-
-3. Förbättrad Felhantering
-Implementera robust felhantering i alla asynkrona funktioner.
-Hantera nätverksfel, felaktiga svar och undantag.
-Visa användarvänliga felmeddelanden eller notifieringar vid problem.
-
-4. Optimera Asynkrona Förfrågningar
-Använd Promise.all() för att hantera flera asynkrona förfrågningar parallellt när det är lämpligt.
-T.ex., hämta nyheter från flera källor samtidigt.
-Förbättra applikationens prestanda genom att minimera laddningstider.
-
-5. Ny Funktionalitet: Realtidsuppdateringar (Valfritt men rekommenderat)
-Implementera en funktion som periodiskt hämtar de senaste nyheterna utan att användaren behöver uppdatera sidan.
-Använd setInterval() i kombination med asynkrona funktioner.
-Se till att hantera resursanvändning och undvika överbelastning av API:et.
-Validering och Felhantering
-Kontrollera att alla asynkrona operationer har korrekt felhantering.
-Hantera oväntade värden och undantag som kan uppstå under exekveringen.
-Validera användarinmatning innan asynkrona förfrågningar skickas.
+Vi har en switch-case med type = "all" som argument som kollar igenom vad som ska sökas på sidan. T.ex. så är den på "all" som start value där detta blir då hem-sidan. sen om man söker på något som t.ex. Tesla så ändras detta value från "all" till "Tesla" därmed får man resultat om just "sTesla" osv.. sen är economyCategory och topHeadlines unikt tillagda i switchcasen då de har andra endpoints. 
 
 
-Level Ups (Frivilliga Utmaningar)
-1. Caching av Data
-Implementera caching för att minska antalet nätverksförfrågningar.
-Spara hämtade nyhetsdata i LocalStorage eller en variabel.
-Använd den cachade datan vid behov innan nya förfrågningar görs.
-Hantera cache-invalidering baserat på tidsstämplar eller användarens interaktion.
+Inom funktionen så används try and catch för att försöka fetcha och konvertera datan från api:erna till JavaScript object, om detta ej går så kommer en if sats kolla vilken fetch som misslyckades, som sedan kallar en funktion med argumentet av den specifika responset. Därefter kommer ett throw new Error som baseras på statusen (404,401,429 etc.)
 
-2. Infinite Scroll
-Implementera infinite scroll för att dynamiskt ladda fler nyheter när användaren scrollar ner på sidan.
-Hantera asynkrona förfrågningar för att hämta nästa sida med nyheter.
-Se till att användarupplevelsen är smidig och att fel hanteras korrekt.
+I catch blocket kommer en annan funktion kallas på som erbjuder användarvänlig felhantering som tar fel meddelandet från responseMessage och därifrån skapar en container för att displaya vad för slags error som uppstod, och vilken status kod de nämnda erroret innehåller. Med setTimeout så försvinner error meddelandet efter 5 sekunder. 
 
-3. Offline-stöd
-Gör applikationen delvis funktionell när användaren är offline.
-Använd Service Workers för att cacha nödvändiga filer och data.
-Visa meddelanden eller indikationer när användaren är offline.
 
-4. Avancerad Felhantering med Retries
-Implementera en mekanism som försöker igen vid misslyckade nätverksförfrågningar.
-Begränsa antalet försök och hantera backoff-strategier.
-Använd asynkrona funktioner för att hantera retries effektivt.
+Det finns 6 knappar exklusive sök knappen på hemsidans header. Där man kan trycka för att söka på just de ämnen. Annars kan man använda sökrutan för att söka mer specifik eller på annat som inte finns med i knapp-valen.  Home tar dig till hem-sidan där den fetchar api från topheadlines och även economy samt polisAPI:et. Tech, apple och tesla är samma sak som att man faktiskt söker på de i sökrutan. så får man 100 artiklar om de ämnen. Economy och topheadlines är lite annorlunda och fetchar endast 20 artiklar och har andra endpoints än bara sök-parameter som ändras.
 
-5. Använda Externa Bibliotek för Asynkronitet
-Utforska och använd externa bibliotek som Axios för att hantera HTTP-förfrågningar.
-Jämför med fetch() och diskutera fördelar och nackdelar.
-Implementera funktioner med hjälp av biblioteket och asynkron programmering.
+

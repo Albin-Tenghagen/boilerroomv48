@@ -78,7 +78,7 @@ newsContainer.appendChild(articleSection);
 
 const section2Header = document.createElement("h1");
 section2Header.setAttribute("class", "section2Header");
-section2Header.innerText = "news from swedish police, Time to train!";
+section2Header.innerText = "news from swedish police, Time to train your swedish!";
 newsContainer.appendChild(section2Header);
 
 const articleSection2 = document.createElement("section");
