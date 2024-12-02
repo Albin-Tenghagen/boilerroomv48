@@ -101,29 +101,29 @@ const fetchApiResults = async (type = "all") => {
     switch (type) {
       case "topHeadlines":
         url =
-          "https://newsapi.org/v2/top-headlines?country=us&language=en&apiKey=a5e3e0dc52244181a7517d579bb03bb5";
+          "https://newsapi.org/v2/top-headlines?country=us&language=en&apiKey=1006e9f332db40bd8553b27720785488";
         break;
 
       case "all":
         requests = [
           fetch(
-            "https://newsapi.org/v2/top-headlines?country=us&language=en&apiKey=a5e3e0dc52244181a7517d579bb03bb5"
+            "https://newsapi.org/v2/top-headlines?country=us&language=en&apiKey=1006e9f332db40bd8553b27720785488"
           ),
           fetch(
-            "https://newsapi.org/v2/top-headlines?language=en&category=business&apiKey=a5e3e0dc52244181a7517d579bb03bb5"
+            "https://newsapi.org/v2/top-headlines?language=en&category=business&apiKey=1006e9f332db40bd8553b27720785488"
           ),
         ];
         break;
 
       case "economyCategory":
         url =
-          "https://newsapi.org/v2/top-headlines?language=en&category=business&apiKey=a5e3e0dc52244181a7517d579bb03bb5";
+          "https://newsapi.org/v2/top-headlines?language=en&category=business&apiKey=1006e9f332db40bd8553b27720785488";
         break;
 
       default:
         url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(
           type
-        )}&language=en&from=2024-11-15&sortBy=publishedAt&apiKey=a5e3e0dc52244181a7517d579bb03bb5`;
+        )}&language=en&from=2024-11-15&sortBy=publishedAt&apiKey=1006e9f332db40bd8553b27720785488`;
         break;
     }
 
