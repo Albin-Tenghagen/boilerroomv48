@@ -185,6 +185,7 @@ const fetchApiResults = async (type = "all") => {
 
       // filters the array so that every "article.content ["Removed"] is filtered away.
       articleArray = await articleArray.filter(
+        // optional chaining operator with ? it returns undefined instead of an error. It checks if the value before it is null or undefined.
         (article) => article?.content?.toLowerCase() !== "[removed]"
       );
 
